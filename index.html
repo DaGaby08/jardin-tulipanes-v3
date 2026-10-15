@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jardín de tulipanes</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:linear-gradient(160deg,#fff1f6,#f3ecff 60%,#eaf6ff);--fg:#33252d;--card:#fff;--seg:#0000000d;--segon:#fff;--line:#0002;--inp:#fff}
+body.dark{--bg:#14111a;--fg:#f2e9f0;--card:#211c2b;--seg:#ffffff14;--segon:#3a3248;--line:#ffffff30;--inp:#2b2536}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
+header{text-align:center;padding:22px 16px 4px}
+header h1{margin:0;font-size:clamp(1.4rem,4vw,2rem)}
+header p{margin:6px 0 0;opacity:.7}
+main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;max-width:1150px;margin:0 auto;padding:16px}
+#stage{display:flex;flex-direction:column;align-items:center;gap:10px}
+#wrap{position:relative;display:inline-block;max-width:100%;line-height:0}
+#wrap canvas{display:block}
+#hint{margin:0;font-size:.85rem;opacity:.7;text-align:center}
+#ed{display:none;position:absolute;transform:translate(-50%,-50%);width:88%;text-align:center;background:#fffffff0;color:#222;border:2px solid #d6457a;border-radius:12px;padding:6px;line-height:1.2;outline:none}
+canvas{cursor:move;touch-action:none;max-width:100%;max-height:78vh;border-radius:20px;box-shadow:0 14px 44px #4a2a6a40}
+#panel{display:flex;flex-direction:column;gap:14px}
+@media(min-width:861px){#stage{position:sticky;top:14px;align-self:start}}
+@media(max-width:860px){main{grid-template-columns:1fr}canvas{max-height:62vh}}
+.card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 4px 18px #0001}
+.card h2{margin:0 0 10px;font-size:1rem;display:flex;gap:8px;align-items:center}
+.num{background:#d6457a;color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.8rem}
+.seg{display:flex;background:var(--seg);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;background:transparent;border:0;padding:11px 6px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer;color:inherit}
+.seg button.on{background:var(--segon);box-shadow:0 2px 8px #0002;color:#d6457a}
+label{display:block;font-size:.85rem;font-weight:600;margin:12px 0 5px}
+input[type=text],select{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:var(--inp);color:inherit}
+input[type=range]{width:100%;accent-color:#d6457a}
+.sw{display:flex;gap:10px;flex-wrap:wrap}
+.sw input[type=color]{width:38px;height:38px;border:0;padding:0;background:none;cursor:pointer}
+.sw button{width:38px;height:38px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1.5px #0003;cursor:pointer}
+.sw button.on{box-shadow:0 0 0 3px #d6457a}
+.link{margin-top:12px;width:100%;padding:10px;border-radius:10px;border:1.5px dashed var(--line);background:transparent;color:inherit;font:inherit;cursor:pointer}
+.dl{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:14px 16px;border-radius:14px;border:0;color:#fff;font:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;margin-bottom:10px;gap:2px}
+.dl small{font-weight:400;opacity:.92;font-size:.8rem}
+.dl:disabled{opacity:.6;cursor:wait}
+#png{background:#d6457a}#gif{background:#7a4fd6}
+#msg{font-size:.85rem;min-height:1.2em;text-align:center}
+</style>
+</head>
+<body>
+<header><h1>🌷 Mi jardín de tulipanes</h1><p>Personalízalo y descárgalo como fondo de pantalla</p>
+<div class="seg" id="th" style="max-width:300px;margin:12px auto 0"><button class="on" data-v="0">🌞 Interfaz clara</button><button data-v="1">🌑 Interfaz oscura</button></div></header>
+<main>
+<div id="stage"><div id="wrap"><canvas id="c"></canvas><input id="ed" type="text" maxlength="60"></div><p id="hint">✏️ Toca el texto para editarlo · arrástralo para moverlo</p></div>
+<div id="panel">
+  <div class="card"><h2><span class="num">1</span>¿Día o noche?</h2>
+    <div class="seg" id="tm"><button class="on" data-v="0">☀️ Día</button><button data-v="1">🌙 Noche</button></div>
+    <small style="opacity:.65;display:block;margin-top:8px">De noche aparecen luciérnagas ✨</small></div>
+  <div class="card"><h2><span class="num">2</span>¿Para qué pantalla?</h2>
+    <div class="seg" id="fm"><button class="on" data-v="p">📱 Celular</button><button data-v="l">💻 Laptop</button></div></div>
+  <div class="card"><h2><span class="num">3</span>Hazlo tuyo</h2>
+    <label for="txt">Tu texto</label><input type="text" id="txt" value="Para ti 🌷" maxlength="60">
+    <label for="font">Tipo de letra</label>
+    <select id="font"><option value="Georgia, serif">Elegante</option><option value="'Brush Script MT', cursive">Manuscrita</option><option value="system-ui, sans-serif">Moderna</option><option value="'Courier New', monospace">Máquina de escribir</option></select>
+    <label for="fs">Tamaño de la letra</label><input type="range" id="fs" min="4" max="20" step=".5" value="9">
+    <label>Color de la letra</label>
+    <div class="sw" id="tc">
+      <button class="on" data-v="#ffffff" title="Blanco" style="background:#fff"></button>
+      <button data-v="#1b1b1b" title="Negro" style="background:#1b1b1b"></button>
+      <button data-v="#ffb3d1" title="Rosa" style="background:#ffb3d1"></button>
+      <button data-v="#ffe58a" title="Amarillo" style="background:#ffe58a"></button>
+      <button data-v="#b8f5d0" title="Menta" style="background:#b8f5d0"></button>
+      <input type="color" id="tcc" value="#ffffff" title="Otro color">
+    </div>
+    <label>Dónde va el texto <small style="font-weight:400;opacity:.7">(también arrástralo sobre la imagen)</small></label>
+    <div class="seg" id="ps"><button class="on" data-v="t">Arriba</button><button data-v="m">Centro</button><button data-v="b">Abajo</button></div>
+    <label for="tx">Mover a los lados</label><input type="range" id="tx" min="0" max="100" value="50">
+    <label for="ty">Mover arriba / abajo</label><input type="range" id="ty" min="0" max="100" value="27">
+    <label>Color de los tulipanes</label>
+    <div class="sw" id="cl">
+      <button class="on" data-v="mix" title="Mixtos" style="background:conic-gradient(#e6407f,#f2b632,#8e4fd0,#ee7a2a,#e6407f)"></button>
+      <button data-v="330" title="Rosa" style="background:#e6407f"></button>
+      <button data-v="350" title="Rojo" style="background:#d92b3f"></button>
+      <button data-v="48" title="Amarillo" style="background:#f2b632"></button>
+      <button data-v="280" title="Morado" style="background:#8e4fd0"></button>
+      <button data-v="22" title="Naranja" style="background:#ee7a2a"></button>
+      <button data-v="0w" title="Blanco" style="background:#f6eef4"></button>
+    </div>
+    <label for="n">Cantidad de tulipanes</label><input type="range" id="n" min="8" max="60" value="30">
+    <button class="link" id="seed">🌱 Replantar (cambiar la distribución)</button></div>
+  <div class="card"><h2><span class="num">4</span>Descarga</h2>
+    <button class="dl" id="png">⬇️ Fondo de pantalla (PNG)<small id="ps1"></small></button>
+    <button class="dl" id="gif">⬇️ Fondo animado (GIF)<small id="gs1"></small></button>
+    <div id="msg"></div></div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id),TAU=Math.PI*2;
+const cv=$('c'),ctx=cv.getContext('2d');
+let night=false,fmt='p',col='mix',tcol='#ffffff',tx=.5,ty=.27,editing=false,tb={x:.5,y:.27,hw:.2,hh:.05},seed=1,flowers=[],flies=[];
+const rnd=s=>()=>(s=(s*16807)%2147483647)/2147483647;
+const size=big=>fmt==='p'?(big?[1080,1920]:[450,800]):(big?[1920,1080]:[800,450]);
+const gifSize=()=>fmt==='p'?[432,768]:[768,432];
+
+function seg(id,fn){const el=$(id);el.onclick=e=>{const b=e.target.closest('button');if(!b)return;[...el.children].forEach(c=>c.classList.toggle('on',c===b));fn(b.dataset.v)}}
+
+function build(){
+  const r=rnd(seed*7919+13),n=+$('n').value,hues=[330,350,48,280,22,0];
+  flowers=[];
+  for(let i=0;i<n;i++){
+    const h=col==='mix'?hues[(r()*hues.length)|0]:parseInt(col);
+    flowers.push({x:r(),d:r(),h,white:col==='0w'||(col==='mix'&&h===0),ph:r(),b:r()*2-1,l2:r()>.4});
+  }
+  flowers.sort((a,b)=>a.d-b.d);
+  flies=[];
+  for(let i=0;i<45;i++)flies.push({x:r(),y:.35+r()*.6,fx:1+((r()*3)|0),fy:1+((r()*3)|0),p:r(),q:r(),g:r(),s:.6+r()});
+}
+
+const hsl=(f,l)=>f.white?`hsl(330,28%,${Math.min(97,l+28)}%)`:`hsl(${f.h},78%,${l}%)`;
+
+function tulip(g,x,y,s,f,t){
+  const sw=Math.sin(TAU*(t+f.ph))*.07,H=s*3.6,tx=x+Math.sin(sw)*H,ty=y-H*Math.cos(sw),dk=night?10:0;
+  g.strokeStyle=night?'#2d6a4f':'#3c9a52';g.lineWidth=s*.17;g.lineCap='round';
+  g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+Math.sin(sw)*H*.15-f.b*s*.35,y-H*.5,tx,ty);g.stroke();
+  for(const L of[-1,1]){
+    if(L===1&&!f.l2)continue;
+    g.fillStyle=night?(L<0?'#2a5f42':'#336f4c'):(L<0?'#4aaa5a':'#5cbb68');
+    g.beginPath();g.moveTo(x,y-s*.1);g.quadraticCurveTo(x+L*s*1.5,y-H*.3,x+L*s*.6+Math.sin(sw)*s,y-H*.72);g.quadraticCurveTo(x+L*s*.15,y-H*.3,x,y-s*.1);g.fill();
+  }
+  g.save();g.translate(tx,ty);g.rotate(sw*1.3);
+  let k=g.createLinearGradient(0,-s*1.3,0,s*.4);k.addColorStop(0,hsl(f,66-dk));k.addColorStop(1,hsl(f,40-dk));
+  g.fillStyle=k;g.strokeStyle='#0003';g.lineWidth=s*.03;
+  g.beginPath();g.moveTo(-s*.62,-s*1.05);g.bezierCurveTo(-s*.95,-s*.2,-s*.5,s*.38,0,s*.42);g.bezierCurveTo(s*.5,s*.38,s*.95,-s*.2,s*.62,-s*1.05);
+  g.lineTo(s*.3,-s*.7);g.lineTo(0,-s*1.3);g.lineTo(-s*.3,-s*.7);g.closePath();g.fill();g.stroke();
+  k=g.createLinearGradient(0,-s*1.3,0,s*.4);k.addColorStop(0,hsl(f,78-dk));k.addColorStop(1,hsl(f,52-dk));
+  g.fillStyle=k;g.beginPath();g.moveTo(0,-s*1.3);g.bezierCurveTo(-s*.55,-s*.5,-s*.42,s*.2,0,s*.42);g.bezierCurveTo(s*.42,s*.2,s*.55,-s*.5,0,-s*1.3);g.fill();
+  g.fillStyle='#ffffff55';g.beginPath();g.ellipse(-s*.22,-s*.45,s*.08,s*.3,.25,0,TAU);g.fill();
+  g.restore();
+}
+
+function butterfly(g,x,y,s,c,t){
+  const fl=Math.abs(Math.sin(TAU*8*t));g.fillStyle=c;g.globalAlpha=.92;
+  for(const L of[-1,1]){
+    g.beginPath();g.ellipse(x+L*s*.5*fl,y-s*.25,s*.55*fl+s*.05,s*.7,L*.5,0,TAU);g.fill();
+    g.beginPath();g.ellipse(x+L*s*.4*fl,y+s*.5,s*.4*fl+s*.04,s*.5,-L*.4,0,TAU);g.fill();
+  }
+  g.globalAlpha=1;g.fillStyle='#3a2a33';g.fillRect(x-s*.06,y-s*.7,s*.12,s*1.5);
+}
+const BF=[{x:.25,y:.45,f:1,p:0,c:'#ff8fb8'},{x:.72,y:.52,f:2,p:.3,c:'#ffc34d'},{x:.5,y:.38,f:1,p:.6,c:'#8fb8ff'}];
+
+function grass(g,t,w,h,front){
+  const r=rnd(front?5:6),u=Math.min(w,h),n=front?70:140;
+  for(let i=0;i<n;i++){
+    const x=r()*w,y=h*(front?.93+r()*.07:.76+r()*.2),bh=u*(front?.07:.045)*(.6+r()),sw=Math.sin(TAU*(t+r()))*bh*.2;
+    g.fillStyle=night?`hsl(150,40%,${14+r()*10}%)`:`hsl(${100+r()*30},50%,${35+r()*15}%)`;
+    g.beginPath();g.moveTo(x-u*.006,y);g.quadraticCurveTo(x,y-bh*.6,x+sw,y-bh);g.quadraticCurveTo(x+u*.002,y-bh*.5,x+u*.006,y);g.fill();
+  }
+}
+
+function windmill(g,x,y,s,t){
+  g.save();g.translate(x,y);
+  g.fillStyle=night?'#d8d0e6':'#fff7ee';g.beginPath();g.moveTo(-s*.2,0);g.lineTo(-s*.12,-s*.7);g.lineTo(s*.12,-s*.7);g.lineTo(s*.2,0);g.closePath();g.fill();
+  g.fillStyle='#0000001a';g.beginPath();g.moveTo(s*.2,0);g.lineTo(s*.12,-s*.7);g.lineTo(0,-s*.7);g.lineTo(0,0);g.fill();
+  g.fillStyle=night?'#ffcc66':'#8a5a44';g.beginPath();g.arc(0,-s*.08,s*.06,Math.PI,0);g.lineTo(s*.06,0);g.lineTo(-s*.06,0);g.fill();
+  g.fillStyle=night?'#ffd77a':'#9ccbe8';g.beginPath();g.arc(0,-s*.4,s*.045,0,TAU);g.fill();
+  g.fillStyle=night?'#8a3d62':'#d2455f';g.beginPath();g.moveTo(-s*.15,-s*.7);g.quadraticCurveTo(0,-s*1.02,s*.15,-s*.7);g.closePath();g.fill();
+  g.translate(0,-s*.78);g.rotate(TAU*t);
+  for(let i=0;i<4;i++){
+    g.rotate(Math.PI/2);
+    g.strokeStyle='#7a5a48';g.lineWidth=s*.03;g.beginPath();g.moveTo(0,0);g.lineTo(0,-s*.55);g.stroke();
+    g.fillStyle=night?'#cfc6dde0':'#fffaf2e0';g.fillRect(0,-s*.55,s*.14,s*.42);
+    g.strokeStyle='#7a5a4866';g.lineWidth=s*.01;for(let j=1;j<4;j++){g.beginPath();g.moveTo(0,-s*(.12+j*.1));g.lineTo(s*.14,-s*(.12+j*.1));g.stroke()}
+  }
+  g.fillStyle='#7a5a48';g.beginPath();g.arc(0,0,s*.04,0,TAU);g.fill();
+  g.restore();
+  if(night){g.save();g.globalCompositeOperation='lighter';const q=g.createRadialGradient(x,y-s*.4,0,x,y-s*.4,s*.35);q.addColorStop(0,'#ffc86699');q.addColorStop(1,'#ffc86600');g.fillStyle=q;g.beginPath();g.arc(x,y-s*.4,s*.35,0,TAU);g.fill();g.restore()}
+}
+function balloon(g,x,y,r){
+  g.save();g.translate(x,y);
+  g.strokeStyle=night?'#6a5040':'#8a6a52';g.lineWidth=r*.03;
+  for(const a of[-.5,-.17,.17,.5]){g.beginPath();g.moveTo(a*r*.8,r*.9);g.lineTo(a*r*.3,r*1.55);g.stroke()}
+  g.fillStyle=night?'#7a5236':'#a8734a';g.fillRect(-r*.2,r*1.55,r*.4,r*.28);
+  g.beginPath();g.moveTo(0,r*1.05);g.bezierCurveTo(-r*1.3,r*.3,-r*1.15,-r*1.15,0,-r*1.15);g.bezierCurveTo(r*1.15,-r*1.15,r*1.3,r*.3,0,r*1.05);
+  g.fillStyle=night?'#c25a8a':'#ff8fb8';g.fill();g.save();g.clip();
+  g.fillStyle=night?'#f0cfe0':'#fffafc';for(const a of[-.62,0,.62]){g.beginPath();g.ellipse(a*r,0,r*.2,r*1.3,0,0,TAU);g.fill()}
+  const k=g.createRadialGradient(-r*.4,-r*.5,r*.1,0,0,r*1.4);k.addColorStop(0,'#ffffff55');k.addColorStop(1,'#00000022');g.fillStyle=k;g.fillRect(-r*1.5,-r*1.5,r*3,r*3);
+  g.restore();
+  if(night){g.globalCompositeOperation='lighter';const q=g.createRadialGradient(0,r*.9,0,0,r*.9,r*1.2);q.addColorStop(0,'#ffb35a99');q.addColorStop(1,'#ffb35a00');g.fillStyle=q;g.beginPath();g.arc(0,r*.9,r*1.2,0,TAU);g.fill()}
+  g.restore();
+}
+function lanterns(g,t,w,h){
+  const r=rnd(17),u=Math.min(w,h);
+  for(let i=0;i<14;i++){
+    const k=1+((r()*2)|0),ph=r(),x0=r(),sz=r(),f=(t*k+ph)%1,a=Math.sin(Math.PI*f),x=(x0+Math.sin(TAU*(t*k+ph))*.02)*w,y=h*(.78-f*.7),s=u*(.022+sz*.016);
+    g.save();g.globalAlpha=a;g.globalCompositeOperation='lighter';
+    const gr=g.createRadialGradient(x,y,0,x,y,s*3.2);gr.addColorStop(0,'rgba(255,190,90,.7)');gr.addColorStop(1,'rgba(255,150,60,0)');
+    g.fillStyle=gr;g.beginPath();g.arc(x,y,s*3.2,0,TAU);g.fill();
+    g.globalCompositeOperation='source-over';g.fillStyle='#ffb04a';g.fillRect(x-s*.7,y-s,s*1.4,s*1.6);g.fillStyle='#ffe9a8';g.fillRect(x-s*.45,y-s*.7,s*.9,s*1.1);
+    g.restore();
+  }
+}
+function petals(g,t,w,h){
+  const r=rnd(23),u=Math.min(w,h);
+  for(let i=0;i<16;i++){
+    const ph=r(),x0=r(),sz=r(),f=(t+ph)%1,x=(x0+Math.sin(TAU*(2*t+ph*3))*.05)*w,y=h*(-.05+f*1.1),s=u*(.012+sz*.01);
+    g.save();g.translate(x,y);g.rotate(TAU*(2*t+ph));g.fillStyle=i%2?'#ffb3d1':'#ff8fb8';g.globalAlpha=.85;
+    g.beginPath();g.ellipse(0,0,s,s*.55,0,0,TAU);g.fill();g.restore();
+  }
+}
+
+function draw(g,t,w,h){
+  const u=Math.min(w,h),mx=w>h?.6:.78;
+  let k=g.createLinearGradient(0,0,0,h*.75);
+  if(night){k.addColorStop(0,'#080c28');k.addColorStop(.55,'#27225e');k.addColorStop(1,'#6a3f82')}
+  else{k.addColorStop(0,'#6dbcee');k.addColorStop(.6,'#cdeaf8');k.addColorStop(1,'#ffe0cc')}
+  g.fillStyle=k;g.fillRect(0,0,w,h);
+  if(night){
+    const r=rnd(99);g.fillStyle='#fff';
+    for(let i=0;i<110;i++){g.globalAlpha=.35+.65*Math.abs(Math.sin(TAU*(2*t+r())));g.beginPath();g.arc(r()*w,r()*h*.55,u*.0022*(1+r()),0,TAU);g.fill()}
+    g.globalAlpha=1;g.fillStyle='#f7f3da';g.shadowColor='#f7f3da';g.shadowBlur=u*.07;
+    g.beginPath();g.arc(mx*w,h*.13,u*.07,0,TAU);g.fill();g.shadowBlur=0;
+    g.fillStyle='#e4dfc0';for(const[a,b,c]of[[-.02,-.01,.016],[.02,.015,.012],[-.015,.03,.009]]){g.beginPath();g.arc(mx*w+a*u,h*.13+b*u,c*u,0,TAU);g.fill()}
+  }else{
+    k=g.createRadialGradient(w*.22,h*.13,0,w*.22,h*.13,u*.45);k.addColorStop(0,'#fff6c8cc');k.addColorStop(1,'#fff6c800');
+    g.fillStyle=k;g.fillRect(0,0,w,h);
+    g.fillStyle='#fff3b0';g.beginPath();g.arc(w*.22,h*.13,u*.07,0,TAU);g.fill();
+    g.fillStyle='#ffffffd0';
+    for(let i=0;i<3;i++){const cx=((i*.37+.1+t*1.4)%1.4-.2)*w,cy=h*(.2+i*.07);
+      for(let j=0;j<5;j++){g.beginPath();g.ellipse(cx+j*u*.05,cy+(j%2)*-u*.015,u*.07,u*.035,0,0,TAU);g.fill()}}
+  }
+  const hills=night?['#26506a','#1d4a4a','#163a3c']:['#b5e0b0','#8fcf8a','#5fb36a'];
+  g.fillStyle=hills[0];g.beginPath();g.moveTo(0,h);g.lineTo(0,h*.6);g.bezierCurveTo(w*.25,h*.52,w*.55,h*.66,w,h*.56);g.lineTo(w,h);g.fill();
+  g.fillStyle=hills[1];g.beginPath();g.moveTo(0,h);g.lineTo(0,h*.67);g.bezierCurveTo(w*.3,h*.6,w*.6,h*.74,w,h*.63);g.lineTo(w,h);g.fill();
+  if(w>h)windmill(g,w*.86,h*.655,h*.42,t);
+  else{if(night)lanterns(g,t,w,h);balloon(g,w*.7+Math.sin(TAU*t)*u*.01,h*.47+Math.sin(TAU*t)*u*.015,u*(night?.085:.11))}
+  g.fillStyle=hills[2];g.beginPath();g.moveTo(0,h);g.lineTo(0,h*.75);g.bezierCurveTo(w*.35,h*.68,w*.7,h*.82,w,h*.72);g.lineTo(w,h);g.fill();
+  grass(g,t,w,h,0);
+  for(const f of flowers)tulip(g,f.x*w,h*(.78+f.d*.2),u*(.018+f.d*.05),f,t);
+  if(!night)for(const b of BF)butterfly(g,(b.x+Math.sin(TAU*(b.f*t+b.p))*.1)*w,(b.y+Math.cos(TAU*(b.f*t+b.p))*.05)*h,u*.018,b.c,t);
+  grass(g,t,w,h,1);if(!night&&w<h)petals(g,t,w,h);
+  if(night){
+    g.fillStyle='#0a0a3a44';g.fillRect(0,0,w,h);
+    k=g.createLinearGradient(0,h*.55,0,h*.92);k.addColorStop(0,'#96aaff00');k.addColorStop(.5,'#96aaff26');k.addColorStop(1,'#96aaff00');
+    g.fillStyle=k;g.fillRect(0,h*.55,w,h*.37);
+    g.globalCompositeOperation='lighter';
+    for(const m of flies){
+      const x=(m.x+Math.sin(TAU*(m.fx*t+m.p))*.05)*w,y=(m.y+Math.cos(TAU*(m.fy*t+m.q))*.035)*h;
+      const a=Math.pow(.5+.5*Math.sin(TAU*(2*t+m.g)),1.5),r=u*.032*m.s;
+      const gr=g.createRadialGradient(x,y,0,x,y,r);
+      gr.addColorStop(0,`rgba(255,252,170,${a})`);gr.addColorStop(.2,`rgba(230,255,120,${.5*a})`);gr.addColorStop(1,'rgba(200,255,80,0)');
+      g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();
+    }
+    g.globalCompositeOperation='source-over';
+  }
+  k=g.createRadialGradient(w/2,h/2,u*.4,w/2,h/2,Math.max(w,h)*.75);k.addColorStop(0,'#0000');k.addColorStop(1,night?'#00000066':'#0000002e');
+  g.fillStyle=k;g.fillRect(0,0,w,h);
+  const T=$('txt').value.trim();
+  if(T&&!editing){
+    const fs=u*(+$('fs').value)/100;
+    g.font=`${fs}px ${$('font').value}`;g.textAlign='center';g.textBaseline='middle';
+    const words=T.split(' '),lines=[];let cur='';
+    for(const wd of words){const tt=cur?cur+' '+wd:wd;if(g.measureText(tt).width>w*.85&&cur){lines.push(cur);cur=wd}else cur=tt}
+    lines.push(cur);tb={x:tx,y:ty,hw:Math.max(...lines.map(l=>g.measureText(l).width))/2/w,hh:lines.length*fs*1.2/2/h};
+    const y0=h*ty-(lines.length-1)*fs*.6;
+    const lt=parseInt(tcol.slice(1,3),16)*.3+parseInt(tcol.slice(3,5),16)*.59+parseInt(tcol.slice(5,7),16)*.11;g.shadowColor=lt>140?'#000a':'#fffc';g.shadowBlur=fs*.25;g.shadowOffsetY=fs*.04;g.fillStyle=tcol;
+    lines.forEach((l,i)=>g.fillText(l,w*tx,y0+i*fs*1.2));
+    g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;
+  }
+}
+
+function info(){const a=size(true),b=gifSize();$('ps1').textContent=`${a[0]}×${a[1]} px · alta calidad`;$('gs1').textContent=`${b[0]}×${b[1]} px · animación en bucle`}
+function resize(){const[w,h]=size();cv.width=w;cv.height=h;build();info()}
+(function loop(){draw(ctx,(performance.now()/4000)%1,cv.width,cv.height);requestAnimationFrame(loop)})();
+
+function save(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+const nm=ext=>`jardin-tulipanes-${night?'noche':'dia'}-${fmt==='p'?'celular':'laptop'}.${ext}`;
+
+$('png').onclick=()=>{
+  const[w,h]=size(true),c=document.createElement('canvas');c.width=w;c.height=h;
+  draw(c.getContext('2d'),.25,w,h);
+  c.toBlob(b=>{save(b,nm('png'));$('msg').textContent='¡Listo! Imagen descargada 🌷'});
+};
+
+function encodeGIF(frames,w,h,delay){
+  const o=[],p=(...a)=>{for(const x of a)o.push(x)},s=n=>p(n&255,n>>8);
+  p(71,73,70,56,57,97);s(w);s(h);p(247,0,0);
+  for(let r=0;r<6;r++)for(let g=0;g<7;g++)for(let b=0;b<6;b++)p(r*51,Math.round(g*42.5),b*51);
+  for(let i=252;i<256;i++)p(0,0,0);
+  p(33,255,11);'NETSCAPE2.0'.split('').forEach(c=>p(c.charCodeAt(0)));p(3,1,0,0,0);
+  for(const f of frames){
+    p(33,249,4,4);s(delay);p(0,0);p(44);s(0);s(0);s(w);s(h);p(0,8);
+    const out=[];let dict=new Map(),next=258,cs=9,buf=0,bits=0;
+    const emit=c=>{buf|=c<<bits;bits+=cs;while(bits>=8){out.push(buf&255);buf>>=8;bits-=8}};
+    emit(256);let cur=f[0];
+    for(let i=1;i<f.length;i++){
+      const k=(cur<<8)|f[i],v=dict.get(k);
+      if(v!==undefined){cur=v;continue}
+      emit(cur);
+      if(next===4096){emit(256);dict.clear();next=258;cs=9}
+      else{if(next>=(1<<cs))cs++;dict.set(k,next++)}
+      cur=f[i];
+    }
+    emit(cur);emit(257);if(bits>0)out.push(buf&255);
+    for(let i=0;i<out.length;i+=255){const ch=out.slice(i,i+255);p(ch.length);for(const x of ch)o.push(x)}
+    p(0);
+  }
+  p(59);return new Uint8Array(o);
+}
+const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+$('gif').onclick=async()=>{
+  const m=$('msg'),btn=$('gif'),[w,h]=gifSize(),N=36;btn.disabled=true;
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const g=c.getContext('2d',{willReadFrequently:true}),frames=[];
+  for(let i=0;i<N;i++){
+    m.textContent=`Creando tu GIF… ${Math.round(i/N*100)}%`;
+    await new Promise(r=>setTimeout(r));
+    draw(g,i/N,w,h);
+    const d=g.getImageData(0,0,w,h).data,ix=new Uint8Array(w*h);
+    for(let y=0,j=0;y<h;y++)for(let x=0;x<w;x++,j++){
+      const e=(BAY[(x&3)|((y&3)<<2)]-7.5)*3.2,q=j*4;
+      const R=Math.min(5,Math.max(0,Math.round((d[q]+e)/51))),G=Math.min(6,Math.max(0,Math.round((d[q+1]+e)/42.5))),B=Math.min(5,Math.max(0,Math.round((d[q+2]+e)/51)));
+      ix[j]=R*42+G*6+B;
+    }
+    frames.push(ix);
+  }
+  m.textContent='Guardando…';await new Promise(r=>setTimeout(r));
+  save(new Blob([encodeGIF(frames,w,h,8)],{type:'image/gif'}),nm('gif'));
+  m.textContent='¡Listo! GIF descargado 🌷';btn.disabled=false;
+};
+
+seg('tm',v=>night=v==='1');
+seg('fm',v=>{fmt=v;resize()});
+function sync(){$('tx').value=tx*100;$('ty').value=ty*100}
+seg('ps',v=>{ty={t:.27,m:.46,b:.9}[v];tx=.5;sync()});
+seg('tc',v=>tcol=v);
+$('tcc').oninput=e=>{tcol=e.target.value;[...$('tc').children].forEach(c=>c.classList.remove('on'))};
+$('tx').oninput=e=>tx=e.target.value/100;
+$('ty').oninput=e=>ty=e.target.value/100;
+seg('th',v=>document.body.classList.toggle('dark',v==='1'));
+const ed=$('ed');let drag=null;
+const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
+const hit=q=>Math.abs(q[0]-tb.x)<=tb.hw+.03&&Math.abs(q[1]-tb.y)<=tb.hh+.02;
+cv.addEventListener('pointerdown',e=>{const q=pt(e);if(!hit(q))return;cv.setPointerCapture(e.pointerId);drag={dx:tx-q[0],dy:ty-q[1],sx:e.clientX,sy:e.clientY,moved:false}});
+cv.addEventListener('pointermove',e=>{
+  const q=pt(e);
+  if(!drag){cv.style.cursor=hit(q)?'move':'default';return}
+  if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>6)drag.moved=true;
+  if(drag.moved){tx=Math.min(1,Math.max(0,q[0]+drag.dx));ty=Math.min(1,Math.max(0,q[1]+drag.dy));sync()}
+});
+cv.addEventListener('pointerup',()=>{if(drag&&!drag.moved)openEd();drag=null});
+cv.addEventListener('pointercancel',()=>drag=null);
+function openEd(){
+  editing=true;const r=cv.getBoundingClientRect(),fs=Math.min(cv.width,cv.height)*(+$('fs').value)/100*(r.width/cv.width);
+  ed.value=$('txt').value;
+  Object.assign(ed.style,{display:'block',left:tx*100+'%',top:ty*100+'%',fontSize:Math.max(16,fs)+'px',fontFamily:$('font').value});
+  ed.focus();ed.select();
+}
+ed.oninput=()=>{$('txt').value=ed.value};
+const closeEd=()=>{editing=false;ed.style.display='none'};
+ed.onblur=closeEd;ed.onkeydown=e=>{if(e.key==='Enter'||e.key==='Escape')closeEd()};
+seg('cl',v=>{col=v;build()});
+$('n').oninput=build;
+$('seed').onclick=()=>{seed++;build()};
+resize();sync();
+</script>
+</body>
+</html>
