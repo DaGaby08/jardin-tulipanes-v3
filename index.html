@@ -2,52 +2,72 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jardín de tulipanes</title>
 <style>
-*{box-sizing:border-box}
-:root{--bg:linear-gradient(160deg,#fff1f6,#f3ecff 60%,#eaf6ff);--fg:#33252d;--card:#fff;--seg:#0000000d;--segon:#fff;--line:#0002;--inp:#fff}
-body.dark{--bg:#14111a;--fg:#f2e9f0;--card:#211c2b;--seg:#ffffff14;--segon:#3a3248;--line:#ffffff30;--inp:#2b2536}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
-header{text-align:center;padding:22px 16px 4px}
-header h1{margin:0;font-size:clamp(1.4rem,4vw,2rem)}
-header p{margin:6px 0 0;opacity:.7}
-main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;max-width:1150px;margin:0 auto;padding:16px}
-#stage{display:flex;flex-direction:column;align-items:center;gap:10px}
-#wrap{position:relative;display:inline-block;max-width:100%;line-height:0}
-#wrap canvas{display:block}
-#hint{margin:0;font-size:.85rem;opacity:.7;text-align:center}
-#ed{display:none;position:absolute;transform:translate(-50%,-50%);width:88%;text-align:center;background:#fffffff0;color:#222;border:2px solid #d6457a;border-radius:12px;padding:6px;line-height:1.2;outline:none}
-canvas{cursor:move;touch-action:none;max-width:100%;max-height:78vh;border-radius:20px;box-shadow:0 14px 44px #4a2a6a40}
-#panel{display:flex;flex-direction:column;gap:14px}
-@media(min-width:861px){#stage{position:sticky;top:14px;align-self:start}}
-@media(max-width:860px){main{grid-template-columns:1fr}canvas{max-height:62vh}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:linear-gradient(160deg,#fff1f6,#f3ecff 60%,#eaf6ff);--bgs:#fbf3fa;--fg:#33252d;--card:#fff;--seg:#0000000d;--segon:#fff;--line:#0002;--inp:#fff;--ac:#d6457a}
+body.dark{--bg:#14111a;--bgs:#14111a;--fg:#f2e9f0;--card:#211c2b;--seg:#ffffff14;--segon:#3a3248;--line:#ffffff30;--inp:#2b2536}
+html{height:100%}
+body{margin:0;height:100dvh;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg)}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;flex:none}
+header h1{margin:0;font-size:clamp(1.15rem,3.5vw,1.5rem)}
+header p{margin:2px 0 0;opacity:.65;font-size:.85rem}
+#th{flex:none;min-height:42px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:inherit;font:inherit;font-weight:600;cursor:pointer}
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:minmax(0,1fr)}
+#stage{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;padding:8px 24px 24px;min-width:0;min-height:0}
+#wrap{position:relative;flex:none;line-height:0}
+#hint{margin:0;font-size:.8rem;opacity:.7;text-align:center;flex:none}
+#ed{display:none;position:absolute;transform:translate(-50%,-50%);width:88%;text-align:center;background:#fffffff0;color:#222;border:2px solid var(--ac);border-radius:12px;padding:6px;line-height:1.2;outline:none}
+canvas{flex:none;display:block;touch-action:none;border-radius:20px;box-shadow:0 14px 44px #4a2a6a40}
+#panel{overflow-y:auto;padding:8px 24px 24px 4px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin}
 .card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 4px 18px #0001}
 .card h2{margin:0 0 10px;font-size:1rem;display:flex;gap:8px;align-items:center}
-.num{background:#d6457a;color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.8rem}
+.num{background:var(--ac);color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.8rem}
 .seg{display:flex;background:var(--seg);border-radius:12px;padding:4px;gap:4px}
-.seg button{flex:1;background:transparent;border:0;padding:11px 6px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer;color:inherit}
-.seg button.on{background:var(--segon);box-shadow:0 2px 8px #0002;color:#d6457a}
-label{display:block;font-size:.85rem;font-weight:600;margin:12px 0 5px}
-input[type=text],select{width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:var(--inp);color:inherit}
-input[type=range]{width:100%;accent-color:#d6457a}
+.seg button{flex:1;min-height:44px;background:transparent;border:0;padding:6px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer;color:inherit}
+.seg button.on{background:var(--segon);box-shadow:0 2px 8px #0002;color:var(--ac)}
+label{display:block;font-size:.85rem;font-weight:600;margin:14px 0 5px}
+input[type=text],select{width:100%;min-height:44px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:var(--inp);color:inherit}
+input[type=range]{width:100%;min-height:32px;accent-color:var(--ac)}
 .sw{display:flex;gap:10px;flex-wrap:wrap}
-.sw input[type=color]{width:38px;height:38px;border:0;padding:0;background:none;cursor:pointer}
-.sw button{width:38px;height:38px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1.5px #0003;cursor:pointer}
-.sw button.on{box-shadow:0 0 0 3px #d6457a}
-.link{margin-top:12px;width:100%;padding:10px;border-radius:10px;border:1.5px dashed var(--line);background:transparent;color:inherit;font:inherit;cursor:pointer}
-.dl{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:14px 16px;border-radius:14px;border:0;color:#fff;font:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;margin-bottom:10px;gap:2px}
+.sw input[type=color]{width:40px;height:40px;border:0;padding:0;background:none;cursor:pointer}
+.sw button{width:40px;height:40px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1.5px #0003;cursor:pointer}
+.sw button.on{box-shadow:0 0 0 3px var(--ac)}
+.link{margin-top:14px;width:100%;min-height:44px;padding:10px;border-radius:10px;border:1.5px dashed var(--line);background:transparent;color:inherit;font:inherit;cursor:pointer}
+.dl{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:14px 16px;border-radius:14px;border:0;color:#fff;font:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:10px;gap:2px;text-align:left}
 .dl small{font-weight:400;opacity:.92;font-size:.8rem}
 .dl:disabled{opacity:.6;cursor:wait}
-#png{background:#d6457a}#gif{background:#7a4fd6}
-#msg{font-size:.85rem;min-height:1.2em;text-align:center}
+#png{background:var(--ac);margin-top:0}#vid{background:#7a4fd6}
+#bar{height:6px;border-radius:3px;background:var(--seg);overflow:hidden;margin-top:12px;display:none}
+#bar i{display:block;height:100%;width:0;background:#7a4fd6}
+#msg{font-size:.85rem;min-height:1.2em;text-align:center;margin-top:10px}
+.hint{font-size:.75rem;opacity:.65;line-height:1.4;margin:8px 0 0}
+body.rec #panel,body.rec canvas,body.rec #ed{pointer-events:none}
+body.rec #panel{opacity:.6}
+@media(max-width:860px){
+  body{display:block;height:auto;min-height:100dvh}
+  header{padding:10px 14px}
+  header p{display:none}
+  main{display:block}
+  #stage{position:sticky;top:0;z-index:5;height:44dvh;padding:8px 14px;background:var(--bgs)}
+  #panel{overflow:visible;padding:14px 14px max(24px,env(safe-area-inset-bottom))}
+}
+@media(max-width:860px) and (max-height:520px){
+  body{display:flex;height:100dvh}
+  main{display:grid;grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:minmax(0,1fr);flex:1;min-height:0}
+  #stage{position:static;height:auto;background:none}
+  #panel{overflow-y:auto}
+}
 </style>
 </head>
 <body>
-<header><h1>🌷 Mi jardín de tulipanes</h1><p>Personalízalo y descárgalo como fondo de pantalla</p>
-<div class="seg" id="th" style="max-width:300px;margin:12px auto 0"><button class="on" data-v="0">🌞 Interfaz clara</button><button data-v="1">🌑 Interfaz oscura</button></div></header>
+<header>
+  <div><h1>🌷 Mi jardín de tulipanes</h1><p>Personalízalo y descárgalo como fondo de pantalla</p></div>
+  <button id="th">🌑 Oscura</button>
+</header>
 <main>
-<div id="stage"><div id="wrap"><canvas id="c"></canvas><input id="ed" type="text" maxlength="60"></div><p id="hint">✏️ Toca el texto para editarlo · arrástralo para moverlo</p></div>
+<div id="stage"><div id="wrap"><canvas id="c"></canvas><input id="ed" type="text" maxlength="60" enterkeyhint="done"></div><p id="hint">✏️ Toca el texto para editarlo · arrástralo para moverlo</p></div>
 <div id="panel">
   <div class="card"><h2><span class="num">1</span>¿Día o noche?</h2>
     <div class="seg" id="tm"><button class="on" data-v="0">☀️ Día</button><button data-v="1">🌙 Noche</button></div>
@@ -55,7 +75,7 @@ input[type=range]{width:100%;accent-color:#d6457a}
   <div class="card"><h2><span class="num">2</span>¿Para qué pantalla?</h2>
     <div class="seg" id="fm"><button class="on" data-v="p">📱 Celular</button><button data-v="l">💻 Laptop</button></div></div>
   <div class="card"><h2><span class="num">3</span>Hazlo tuyo</h2>
-    <label for="txt">Tu texto</label><input type="text" id="txt" value="Para ti 🌷" maxlength="60">
+    <label for="txt" style="margin-top:0">Tu texto</label><input type="text" id="txt" value="Para ti 🌷" maxlength="60" enterkeyhint="done">
     <label for="font">Tipo de letra</label>
     <select id="font"><option value="Georgia, serif">Elegante</option><option value="'Brush Script MT', cursive">Manuscrita</option><option value="system-ui, sans-serif">Moderna</option><option value="'Courier New', monospace">Máquina de escribir</option></select>
     <label for="fs">Tamaño de la letra</label><input type="range" id="fs" min="4" max="20" step=".5" value="9">
@@ -86,19 +106,20 @@ input[type=range]{width:100%;accent-color:#d6457a}
     <button class="link" id="seed">🌱 Replantar (cambiar la distribución)</button></div>
   <div class="card"><h2><span class="num">4</span>Descarga</h2>
     <button class="dl" id="png">⬇️ Fondo de pantalla (PNG)<small id="ps1"></small></button>
-    <button class="dl" id="gif">⬇️ Fondo animado (GIF)<small id="gs1"></small></button>
-    <div id="msg"></div></div>
+    <label style="margin-top:16px">Calidad del video</label>
+    <div class="seg" id="qq"><button class="on" data-v="720">HD 720p</button><button data-v="1080">Full HD 1080p</button></div>
+    <button class="dl" id="vid">🎬 Fondo animado (video)<small id="vs1"></small></button>
+    <div id="bar"><i></i></div>
+    <div id="msg"></div>
+    <p class="hint">El video dura 8 segundos y está hecho para repetirse sin cortes. Mientras se graba, no cambies de pestaña.</p></div>
 </div>
 </main>
 <script>
 const $=id=>document.getElementById(id),TAU=Math.PI*2;
-const cv=$('c'),ctx=cv.getContext('2d');
-let night=false,fmt='p',col='mix',tcol='#ffffff',tx=.5,ty=.27,editing=false,tb={x:.5,y:.27,hw:.2,hh:.05},seed=1,flowers=[],flies=[];
+const cv=$('c'),ctx=cv.getContext('2d'),stage=$('stage');
+let night=false,fmt=(innerWidth<860||innerHeight>innerWidth)?'p':'l',col='mix',tcol='#ffffff',tx=.5,ty=.27,seed=1,flowers=[],flies=[],recording=false,quality='720',editing=false,tb={x:.5,y:.27,hw:.2,hh:.05};
+const CYCLE=4,LOOPS=2; // un ciclo = 4 s; el video = 2 ciclos = 8 s exactos
 const rnd=s=>()=>(s=(s*16807)%2147483647)/2147483647;
-const size=big=>fmt==='p'?(big?[1080,1920]:[450,800]):(big?[1920,1080]:[800,450]);
-const gifSize=()=>fmt==='p'?[432,768]:[768,432];
-
-function seg(id,fn){const el=$(id);el.onclick=e=>{const b=e.target.closest('button');if(!b)return;[...el.children].forEach(c=>c.classList.toggle('on',c===b));fn(b.dataset.v)}}
 
 function build(){
   const r=rnd(seed*7919+13),n=+$('n').value,hues=[330,350,48,280,22,0];
@@ -221,7 +242,7 @@ function draw(g,t,w,h){
     g.fillStyle=k;g.fillRect(0,0,w,h);
     g.fillStyle='#fff3b0';g.beginPath();g.arc(w*.22,h*.13,u*.07,0,TAU);g.fill();
     g.fillStyle='#ffffffd0';
-    for(let i=0;i<3;i++){const cx=((i*.37+.1+t*1.4)%1.4-.2)*w,cy=h*(.2+i*.07);
+    for(let i=0;i<3;i++){const cx=((i*.37+.1+t*1.8)%1.8-.4)*w,cy=h*(.2+i*.07);
       for(let j=0;j<5;j++){g.beginPath();g.ellipse(cx+j*u*.05,cy+(j%2)*-u*.015,u*.07,u*.035,0,0,TAU);g.fill()}}
   }
   const hills=night?['#26506a','#1d4a4a','#163a3c']:['#b5e0b0','#8fcf8a','#5fb36a'];
@@ -264,75 +285,79 @@ function draw(g,t,w,h){
   }
 }
 
-function info(){const a=size(true),b=gifSize();$('ps1').textContent=`${a[0]}×${a[1]} px · alta calidad`;$('gs1').textContent=`${b[0]}×${b[1]} px · animación en bucle`}
-function resize(){const[w,h]=size();cv.width=w;cv.height=h;build();info()}
-(function loop(){draw(ctx,(performance.now()/4000)%1,cv.width,cv.height);requestAnimationFrame(loop)})();
+function seg(id,fn){const el=$(id);el.onclick=e=>{const b=e.target.closest('button');if(!b)return;[...el.children].forEach(c=>c.classList.toggle('on',c===b));fn(b.dataset.v)}}
+function setSeg(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===v))}
+const vidSize=()=>{const a=quality==='1080'?1080:720,b=quality==='1080'?1920:1280;return fmt==='p'?[a,b]:[b,a]};
 
-function save(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+// Vista previa: se ajusta al espacio disponible
+function fit(){
+  const r=stage.getBoundingClientRect(),cs=getComputedStyle(stage);
+  const pw=r.width-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  const ph=r.height-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-$('hint').offsetHeight-8;
+  if(pw<=0||ph<=0)return;
+  const ar=fmt==='p'?9/16:16/9;
+  let cw=pw,ch=cw/ar;if(ch>ph){ch=ph;cw=ch*ar}
+  cv.style.width=cw+'px';cv.style.height=ch+'px';
+  const dpr=Math.min(devicePixelRatio||1,2);
+  cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);
+}
+function info(){const[w,h]=vidSize();$('ps1').textContent=fmt==='p'?'1080×1920 px · alta calidad':'1920×1080 px · alta calidad';$('vs1').textContent=`${w}×${h} px · 8 s · loop perfecto`}
+(function loop(){if(!recording)draw(ctx,(performance.now()/1000/CYCLE)%1,cv.width,cv.height);requestAnimationFrame(loop)})();
+
+function save(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
 const nm=ext=>`jardin-tulipanes-${night?'noche':'dia'}-${fmt==='p'?'celular':'laptop'}.${ext}`;
 
 $('png').onclick=()=>{
-  const[w,h]=size(true),c=document.createElement('canvas');c.width=w;c.height=h;
-  draw(c.getContext('2d'),.25,w,h);
+  const c=document.createElement('canvas');c.width=fmt==='p'?1080:1920;c.height=fmt==='p'?1920:1080;
+  draw(c.getContext('2d'),.25,c.width,c.height);
   c.toBlob(b=>{save(b,nm('png'));$('msg').textContent='¡Listo! Imagen descargada 🌷'});
 };
 
-function encodeGIF(frames,w,h,delay){
-  const o=[],p=(...a)=>{for(const x of a)o.push(x)},s=n=>p(n&255,n>>8);
-  p(71,73,70,56,57,97);s(w);s(h);p(247,0,0);
-  for(let r=0;r<6;r++)for(let g=0;g<7;g++)for(let b=0;b<6;b++)p(r*51,Math.round(g*42.5),b*51);
-  for(let i=252;i<256;i++)p(0,0,0);
-  p(33,255,11);'NETSCAPE2.0'.split('').forEach(c=>p(c.charCodeAt(0)));p(3,1,0,0,0);
-  for(const f of frames){
-    p(33,249,4,4);s(delay);p(0,0);p(44);s(0);s(0);s(w);s(h);p(0,8);
-    const out=[];let dict=new Map(),next=258,cs=9,buf=0,bits=0;
-    const emit=c=>{buf|=c<<bits;bits+=cs;while(bits>=8){out.push(buf&255);buf>>=8;bits-=8}};
-    emit(256);let cur=f[0];
-    for(let i=1;i<f.length;i++){
-      const k=(cur<<8)|f[i],v=dict.get(k);
-      if(v!==undefined){cur=v;continue}
-      emit(cur);
-      if(next===4096){emit(256);dict.clear();next=258;cs=9}
-      else{if(next>=(1<<cs))cs++;dict.set(k,next++)}
-      cur=f[i];
-    }
-    emit(cur);emit(257);if(bits>0)out.push(buf&255);
-    for(let i=0;i<out.length;i+=255){const ch=out.slice(i,i+255);p(ch.length);for(const x of ch)o.push(x)}
-    p(0);
-  }
-  p(59);return new Uint8Array(o);
-}
-const BAY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
-$('gif').onclick=async()=>{
-  const m=$('msg'),btn=$('gif'),[w,h]=gifSize(),N=36;btn.disabled=true;
+// Video: graba 2 ciclos exactos (8 s) en tiempo real; el último cuadro enlaza con el primero
+$('vid').onclick=()=>{
+  closeEd();const m=$('msg'),btn=$('vid'),bar=$('bar');
+  if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){m.textContent='Tu navegador no puede grabar video. Prueba con Chrome, Edge o Safari actualizado.';return}
+  const mime=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
+  if(!mime){m.textContent='Tu navegador no soporta grabación de video.';return}
+  const ext=mime.includes('mp4')?'mp4':'webm',[w,h]=vidSize();
   const c=document.createElement('canvas');c.width=w;c.height=h;
-  const g=c.getContext('2d',{willReadFrequently:true}),frames=[];
-  for(let i=0;i<N;i++){
-    m.textContent=`Creando tu GIF… ${Math.round(i/N*100)}%`;
-    await new Promise(r=>setTimeout(r));
-    draw(g,i/N,w,h);
-    const d=g.getImageData(0,0,w,h).data,ix=new Uint8Array(w*h);
-    for(let y=0,j=0;y<h;y++)for(let x=0;x<w;x++,j++){
-      const e=(BAY[(x&3)|((y&3)<<2)]-7.5)*3.2,q=j*4;
-      const R=Math.min(5,Math.max(0,Math.round((d[q]+e)/51))),G=Math.min(6,Math.max(0,Math.round((d[q+1]+e)/42.5))),B=Math.min(5,Math.max(0,Math.round((d[q+2]+e)/51)));
-      ix[j]=R*42+G*6+B;
-    }
-    frames.push(ix);
-  }
-  m.textContent='Guardando…';await new Promise(r=>setTimeout(r));
-  save(new Blob([encodeGIF(frames,w,h,8)],{type:'image/gif'}),nm('gif'));
-  m.textContent='¡Listo! GIF descargado 🌷';btn.disabled=false;
+  const g=c.getContext('2d');
+  draw(g,0,w,h);
+  const rec=new MediaRecorder(c.captureStream(30),{mimeType:mime,videoBitsPerSecond:quality==='1080'?14e6:8e6});
+  const parts=[];rec.ondataavailable=e=>{if(e.data.size)parts.push(e.data)};
+  const DUR=CYCLE*LOOPS;
+  rec.onstop=()=>{
+    recording=false;document.body.classList.remove('rec');btn.disabled=false;bar.style.display='none';
+    save(new Blob(parts,{type:mime}),nm(ext).replace('.'+ext,'-loop.'+ext));
+    m.textContent=`¡Listo! Video ${ext.toUpperCase()} descargado 🌷`;
+  };
+  recording=true;document.body.classList.add('rec');btn.disabled=true;bar.style.display='block';
+  let t0;
+  rec.start();
+  const tick=now=>{
+    if(t0===undefined)t0=now;
+    const el=(now-t0)/1000;
+    bar.firstElementChild.style.width=Math.min(100,el/DUR*100)+'%';
+    m.textContent=`Grabando… ${Math.max(0,Math.ceil(DUR-el))} s`;
+    if(el>=DUR){rec.stop();return}
+    draw(g,(el/CYCLE)%1,w,h);
+    ctx.drawImage(c,0,0,cv.width,cv.height);
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 };
 
 seg('tm',v=>night=v==='1');
-seg('fm',v=>{fmt=v;resize()});
+seg('fm',v=>{fmt=v;fit();info()});
+seg('qq',v=>{quality=v;info()});
 function sync(){$('tx').value=tx*100;$('ty').value=ty*100}
 seg('ps',v=>{ty={t:.27,m:.46,b:.9}[v];tx=.5;sync()});
 seg('tc',v=>tcol=v);
 $('tcc').oninput=e=>{tcol=e.target.value;[...$('tc').children].forEach(c=>c.classList.remove('on'))};
 $('tx').oninput=e=>tx=e.target.value/100;
 $('ty').oninput=e=>ty=e.target.value/100;
-seg('th',v=>document.body.classList.toggle('dark',v==='1'));
+function theme(d){document.body.classList.toggle('dark',d);$('th').textContent=d?'🌞 Clara':'🌑 Oscura'}
+$('th').onclick=()=>theme(!document.body.classList.contains('dark'));
 const ed=$('ed');let drag=null;
 const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
 const hit=q=>Math.abs(q[0]-tb.x)<=tb.hw+.03&&Math.abs(q[1]-tb.y)<=tb.hh+.02;
@@ -357,7 +382,12 @@ ed.onblur=closeEd;ed.onkeydown=e=>{if(e.key==='Enter'||e.key==='Escape')closeEd(
 seg('cl',v=>{col=v;build()});
 $('n').oninput=build;
 $('seed').onclick=()=>{seed++;build()};
-resize();sync();
+$('txt').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});
+theme(matchMedia('(prefers-color-scheme:dark)').matches);
+setSeg('fm',fmt);
+new ResizeObserver(fit).observe(stage);
+addEventListener('resize',fit);
+build();sync();fit();info();
 </script>
 </body>
 </html>
